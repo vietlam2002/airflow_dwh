@@ -1,0 +1,18 @@
+create:
+  # MongoDB
+  # Specify either the connection string or the (host, password, user, port) to connect to MongoDB.
+  MONGODB_CONNECTION_STRING: ""
+  MONGODB_HOST:
+  MONGODB_PORT:
+  MONGODB_USER:
+  MONGODB_PASSWORD:
+  MONGODB_DATABASE: CreateCopied
+
+  # PostgresSQL
+  POSTGRES_CONNECT_TIMEOUT: 10
+  POSTGRES_DBNAME:
+  POSTGRES_SCHEMA: public # Optional
+  POSTGRES_USER:
+  POSTGRES_PASSWORD:
+  POSTGRES_HOST:
+  POSTGRES_PORT:

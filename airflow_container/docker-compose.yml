@@ -1,0 +1,46 @@
+version: "3.9"
+
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  env_file:
+    - airflow.env
+  volumes:
+    - ./job:/opt/airflow/jobs
+    - ./dags:/opt/airflow/dags
+    - ./scripts:/opt/airflow/scripts
+    - ./data:/opt/airflow/data
+  depends_on:
+    - airflow-db
+  networks:
+    - dwh_airflow
+
+services:
+  
+  #airflow services
+  airflow-db:
+    image: postgres:14.0
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - 4040:5432
+    networks:
+      - dwh_airflow
+  
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      - airflow-scheduler
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: bash -c "airflow db migrate && airflow users create --username admin --firstname Viet --lastname Lam --role Admin --email vietlam050607@gmail.com --password admin && airflow scheduler"
+
+networks:
+    dwh_airflow:
