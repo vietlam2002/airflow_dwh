@@ -11,7 +11,7 @@ sys.path.append(SCRIPTS_DIR)
 # Import các hàm từ scripts
 from data_loaders.load_data_from_create_projects import load_data_mongo
 from data_transformer.transform_data_create_projects import transform_data_project
-
+# from data_exporter.export_data_create_projects import export_data
 # Default arguments cho DAG
 default_args = {
     'owner': 'vietlam',
@@ -33,10 +33,15 @@ def transform_data_task(**kwargs):
     loaded_data = ti.xcom_pull(task_ids='load_data')  # Pull từ task_id 'load_data'
     transform_data_project(loaded_data)  # Gọi hàm transform với dữ liệu đầu vào
 
+# def export_data_task(**kwarg):
+#     ti = kwarg['ti']
+#     transformed_data = ti.xcom_pull(task_ids='transform_data')
+#     # export_data
+
 with DAG(
-    'etl_pipeline_with_xcom',
+    'sync_data_create_projects',
     default_args=default_args,
-    description='ETL Pipeline DAG with XCom',
+    description='sync_data_create_projects',
     schedule_interval=None,
     catchup=False,
 ) as dag:

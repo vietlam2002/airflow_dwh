@@ -11,3 +11,4 @@ def connect_to_mongodb(config):
     client = MongoClient(config['MONGODB_CONNECTION_STRING'])
     # print("connect ok!")
     return client[config['MONGODB_DATABASE']]
+
