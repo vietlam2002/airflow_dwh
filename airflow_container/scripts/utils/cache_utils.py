@@ -1,3 +1,4 @@
+import psycopg2
 import yaml
 import json
 from pymongo import MongoClient
@@ -12,3 +13,12 @@ def connect_to_mongodb(config):
     # print("connect ok!")
     return client[config['MONGODB_DATABASE']]
 
+def get_postgres_connection():
+    conn = psycopg2.connect(
+        host="14.225.205.7",     
+        port=5432,            
+        database="go_chat",   
+        user="root",      
+        password="root"  
+    )
+    return conn
