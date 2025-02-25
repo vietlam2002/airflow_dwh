@@ -10,7 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Đường dẫn tuyệt đối đến file config.yaml
 config_path = os.path.join(current_dir, '..', 'config.yaml')
-
+print(config_path)
 # Thêm thư mục `utils` vào sys.path để có thể import `cache_utils`
 utils_path = os.path.join(current_dir, '..', 'utils')
 sys.path.append(utils_path)

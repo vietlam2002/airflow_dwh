@@ -1,7 +1,7 @@
 create:
   # MongoDB
   # Specify either the connection string or the (host, password, user, port) to connect to MongoDB.
-  MONGODB_CONNECTION_STRING: "mongodb://user:password@ip:port/CreateCopied?authSource=admin"
+  MONGODB_CONNECTION_STRING: "mongodb://portal"
   MONGODB_HOST:
   MONGODB_PORT:
   MONGODB_USER:

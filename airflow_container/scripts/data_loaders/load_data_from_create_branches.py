@@ -5,8 +5,8 @@ from bson import json_util, ObjectId
 from datetime import datetime
 from os import path
 
-client = MongoClient()
-db = client['CreateCopied']
+client = MongoClient("mongodb://datawarehouse_tio:H#nB53k6rGuso6d6@150.95.109.100:27017/portal")
+db = client['portal']
 
 collection = db['projects']
 documents = collection.find({})
@@ -28,6 +28,6 @@ for doc in documents:
 
 df = pd.DataFrame(data)
 data_branches = transform(df)
-print(df['createdAt'].head(2))
+print(df.info())
 # print(data_branches.info())
 # print("done_load")

@@ -7,10 +7,10 @@ x-airflow-common: &airflow-common
   env_file:
     - airflow.env
   volumes:
-    - ./job:/opt/airflow/jobs
     - ./dags:/opt/airflow/dags
     - ./scripts:/opt/airflow/scripts
-    - ./data:/opt/airflow/data
+    - ./plugins:/opt/airflow/plugins
+    - ./config:/opt/airflow/config
   depends_on:
     - airflow-db
   networks:
@@ -41,6 +41,44 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: bash -c "airflow db migrate && airflow users create --username admin --firstname Viet --lastname Lam --role Admin --email vietlam050607@gmail.com --password admin && airflow scheduler"
+  
+  mysql-db-source:
+    image: mysql
+    container_name: mysql-db-source
+    volumes:
+      - mysql_h:/var/lib/mysql
+      - ./dataset:/tmp/dataset
+      - ./load_dataset_into_mysql:/tmp/load_dataset
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=olist
+      - MYSQL_ROOT_USER=root
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_ROOT_PASSWORD=admin
+    networks:
+      - dwh_airflow
+
+  dwh-db:
+    image: postgres:latest
+    container_name: dwh-db
+    hostname: dwh-db
+    volumes:
+      - postgres_data_h:/var/lib/postgres/data
+      - ./pg_hba.conf:/tmp/pg_hba.conf
+    command: ["postgres", "-c", "hba_file=/tmp/pg_hba.conf"]
+    expose:
+      - "3005"
+    ports:
+      - "3005:5432"
+    env_file: airflow.env
+    networks: 
+      - dwh_airflow
 
 networks:
     dwh_airflow:
+volumes:
+  mysql_h: {}
+  postgres-db-volume:
+  postgres_data_h: {}
