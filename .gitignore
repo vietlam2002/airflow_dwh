@@ -1,1 +1,2 @@
-airflow_container/.venv/
+airflow_container/plugins/event_dump_*.json
+airflow_container/plugins/optical-torch-*.json

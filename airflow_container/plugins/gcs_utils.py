@@ -2,6 +2,7 @@ import os
 import mimetypes
 import pathlib
 from google.cloud import storage
+from google.oauth2 import service_account
 
 STORAGE_CLASSES = ('STANDARD', 'NEARLINE', 'COLDLINE', 'ARCHIVE')
 class GCStorage:
@@ -35,29 +36,34 @@ class GCStorage:
     def list_blobs(self, bucket_name):
         return self.client.list_blobs(bucket_name)
 
+credentials_path = '/opt/airflow/plugins/optical-torch-452002-c8-d798135ff968.json'
+project_id = 'optical-torch-452002-c8'
+bucket_name = 'nexar_event_bucket'
+credentials = service_account.Credentials.from_service_account_file(credentials_path)
 
 # Prepare the variables
 working_dir = pathlib.Path.cwd()
-files_folder = working_dir.joinpath('')
+#files_folder = working_dir.joinpath('raw_data')
+files_folder = pathlib.Path('/opt/airflow/plugins/raw_data')
+
 #downloads_folder = working_dir.join_path()
-bucket_name = ''
 
 # Construct GCStorage instance
-storage_client = storage.Client()
-gcs = GCStorage(storage.client)
+storage_client = storage.Client(credentials=credentials, project=project_id)
+gcs = GCStorage(storage_client)
 
 # Create Cloud Storage bucket
-if not bucket_name in gcs.list_buckets():
-    bucket_gcs = gcs.create_bucket('', STORAGE_CLASSES[0])
-else:
-    bucket_gcs = bucket_gcs = gcs.get_bucket(bucket_name)
+#if not bucket_name in gcs.list_buckets():
+#    bucket_gcs = gcs.create_bucket('nexar_event_bucket', STORAGE_CLASSES[0])
+#else:
+bucket_gcs = gcs.get_bucket(bucket_name)
 
+print(bucket_gcs)
 # Upload Files
 for file_path in files_folder.glob('*.*'):
-    # use file name without the extension
-    gcs.upload_file(bucket_gcs, 'without extension/' + file_path.stem, str(file_path))
     # use full file path
     gcs.upload_file(bucket_gcs, file_path.name, str(file_path))
+    print("OKEEEEEEE")
 
 # Download and Delete Files
 #gcs_demo_blobs = gcs.list_blobs('')

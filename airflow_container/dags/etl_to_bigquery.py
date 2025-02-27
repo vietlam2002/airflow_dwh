@@ -6,8 +6,9 @@ import gzip
 import shutil
 import os
 from datetime import datetime, timedelta
+
 airflow_home = os.environ['AIRFLOW_HOME']
-LOCAL_DATA_DIR = f"{airflow_home}/plugins"
+LOCAL_DATA_DIR = f"{airflow_home}/plugins/raw_data"
 
 import stat
 
@@ -18,22 +19,19 @@ def extract_gzip():
             output_path = file_path.replace(".gz", "")
 
             try:
-                # Kiểm tra và thay đổi quyền trước khi ghi
                 if not os.access(LOCAL_DATA_DIR, os.W_OK):
-                    os.chmod(LOCAL_DATA_DIR, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # Cấp quyền đọc, ghi, thực thi
+                    os.chmod(LOCAL_DATA_DIR, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  
 
                 with gzip.open(file_path, 'rb') as f_in, open(output_path, 'wb') as f_out:
                     shutil.copyfileobj(f_in, f_out)
 
                 os.remove(file_path)
-
-                # Đảm bảo file đầu ra có quyền ghi
                 os.chmod(output_path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
             except PermissionError:
-                print(f"⚠️ Không đủ quyền ghi vào: {output_path}")
+                print(f"Permission denied !: {output_path}")
             except Exception as e:
-                print(f"❌ Lỗi khi xử lý {file}: {e}")
+                print(f"Handling Error {file}: {e}")
 
 
 default_args = {
@@ -53,10 +51,24 @@ with DAG(
     
     extract_gzip = PythonOperator(
         task_id="extract_gzip_file",
-        python_callable=extract_gzip
+        python_callable=extract_gzip,
+        execution_timeout=timedelta(minutes=2)
     )
-    note_task = BashOperator(
-        task_id='Notified',
-        bash_command='echo "EXTRACT SUCESSFULL"'
+    note_task1 = BashOperator(
+        task_id='notified1',
+        bash_command=f'echo "EXTRACT GZIP SUCESSFULL" && ls {airflow_home}/plugins/raw_data/'
     )
-extract_gzip >> note_task
+    gcs_copy_operator = BashOperator(
+        task_id="gcs_copy_to_bucket",
+        bash_command=f'ls -l {LOCAL_DATA_DIR} && python3 {airflow_home}/plugins/gcs_utils.py'
+    )
+    note_task2 = BashOperator(
+        task_id="notified2",
+        bash_command='echo "LOAD JSON FILE TO BUCKET SUCESSFULL"'
+    )
+
+    delete_json_files = BashOperator(
+        task_id="delete_json_files",
+        bash_command=f'rm -rf {LOCAL_DATA_DIR}/*.json && echo "Deleted all JSON files from raw_data"'
+    )
+extract_gzip >> note_task1 >> gcs_copy_operator >> note_task2 >> delete_json_files
