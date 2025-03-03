@@ -48,8 +48,8 @@ print("Using Project ID:", client.project)
 
 datasets = list(client.list_datasets())
 print("Datasets:", [dataset.dataset_id for dataset in datasets])
-query = "SELECT * FROM `optical-torch-452002-c8.nexar_event.event` "
-query_job = client.query(query)
-results = query_job.result()
+#query = "SELECT * FROM `optical-torch-452002-c8.nexar_event.event` "
+#query_job = client.query(query)
+#results = query_job.result()
 
 
