@@ -1,2 +1,4 @@
 airflow_container/plugins/event_dump_*.json
 airflow_container/plugins/optical-torch-*.json
+airflow_container/scripts/data/part_*
+airflow_container/scripts/data/eventts.csv
