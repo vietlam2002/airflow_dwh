@@ -1,2 +1,3 @@
 airflow_container/plugins/event_dump_*.json
 
+.qodo

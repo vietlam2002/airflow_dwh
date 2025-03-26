@@ -76,6 +76,22 @@ services:
     networks: 
       - dwh_airflow
 
+  minio:
+    hostname: minio_british
+    image: minio/minio:latest
+    container_name: minio_british
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data_s3:/data
+    environment:
+      MINIO_ROOT_USER: vietlam
+      MINIO_ROOT_PASSWORD: 20022003
+    command: server /data --console-address ":9001"
+    networks:
+      - dwh_airflow
+
 networks:
     dwh_airflow:
 volumes:
